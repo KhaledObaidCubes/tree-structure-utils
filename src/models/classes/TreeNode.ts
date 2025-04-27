@@ -8,11 +8,11 @@ class TreeNode implements ITreeNode{
     totalNodes: number=0
     //instead of initialize data, a default empty object is passed
     constructor(nodeToAdd:TNode={name:'',children:[]}){
-        this.data=nodeToAdd
-        this.data.name = nodeToAdd.name
-        //the following line is to spread given children array in the place where it was added -this-
-       // this.data.children=[...nodeToAdd.children]
-        this.data.children=nodeToAdd.children.map((child) => new TreeNode(child.data));
+        this.data={//I reduce code by assign the name and the children array directly to the nod's data
+            name:nodeToAdd.name,
+            children:nodeToAdd.children.map((child) => new TreeNode(child.data))//now create instance tree of each nod's and sub node(s)
+        }
+        
     }
     private _depth:number = 0
     private _indexInParent:number = 0
@@ -20,40 +20,47 @@ class TreeNode implements ITreeNode{
     
   
 
-    addChild(node:TreeNode){
-        addTreeNode(this,node.data)
-        node.numDescendants=getAllChildren(node)+1
+    addChild(node: TreeNode) {
+        //I handle that case of creating node with empty or undefined node
+        if (!node) throw new Error(`CANNOT ADD UNDEFINED OR NULL NODE!`)
+        addTreeNode(this, node)
+        this.updateDescendants()
     }
     
-    totalNodeNumber(){
-        return getAllChildren(this)
+    totalNodeNumber(): number {
+        return getAllChildren(this);
     }
 
-
-    set depth(_:number){
-        this._depth = _
+    set depth(value: number) {
+        this._depth = value;
     }
-    get depth(){ 
-    return this._depth
-    }
-    set indexInParent(_:number){this._indexInParent = _}
-    get indexInParent(){
-    return this._indexInParent
-    }
-    set parentTree(_:TreeNode|undefined){
-    if(!_) throw new Error("CANNOT SET PARENT TO UNDEFINED")
-    this._parentTree = _
-    }
-    get parentTree(){
-    return this._parentTree
-    }
-   
-    get flattenArray(){
-        return flattTree(this)
+    get depth() {
+        return this._depth;
     }
 
-  
+    set indexInParent(value: number) {
+        this._indexInParent = value;
+    }
+    get indexInParent() {
+        return this._indexInParent;
+    }
 
+    set parentTree(value: TreeNode | undefined) {
+        if (!value) throw new Error("CANNOT SET PARENT TO UNDEFINED");
+        this._parentTree = value;
+    }
+    get parentTree() {
+        return this._parentTree;
+    }
+
+    get flattenArray() {
+        return flattTree(this);
+    }
+
+    private updateDescendants() {
+        this.numDescendants = getAllChildren(this) - 1; // except the node am stand on
+        this.totalNodes = getAllChildren(this);
+    }
 }
 
-export {TreeNode}
+export { TreeNode };
