@@ -2,10 +2,13 @@ import { TreeNode } from "./classes/TreeNode";
 import type { ITreeNode } from "./interfaces/I-TreeNode";
 
 const addTreeNode = (targetTree: ITreeNode, node: ITreeNode) => {
-    node.indexInParent = targetTree.data.children.length;
-    node.depth = targetTree.depth + 1;
-    targetTree.data.children.push(node); // directly add node, no need to re-wrap the wrong code was targetTree.data.children.push(new TreeNode(node))
+    
+    node.indexInParent = targetTree.data.children.length;//tested
+    
     node.parentTree = targetTree as TreeNode;
+    node.depth = targetTree.depth + 1;//tested
+    
+    targetTree.data.children.push(node); // directly add node, no need to re-wrap the wrong code was targetTree.data.children.push(new TreeNode(node))
 };
 
 const flattTree = (data: TreeNode) => {

@@ -1,50 +1,117 @@
 <script setup lang="ts">
+import { onMounted, reactive, ref } from "vue";
 import { TreeNode } from "./models/classes/TreeNode";
+import type{ TNode } from "./models/interfaces/i-types";
 
-const tree = new TreeNode({ name: "", children: [] });
-tree.data.name = "root";
-////////////////////////// TEST 1 ///////////////////////////////////
+
+const treeI = reactive(new TreeNode());
+treeI.data.name = "treeI root";
+////////////////////////// CREATE NODE INDIVIDUALLY ///////////////////////////////////
  const node1=new TreeNode({name:'khaled',children:[]})
-// const node2= new TreeNode({name:'walied',children:[]})
-// const node3= new TreeNode({name:'Shaikh',children:[]})
-// const node4= new TreeNode({name:'saleh',children:[]})
+const node2= new TreeNode({name:'walied',children:[]})
+const node3= new TreeNode({name:'Shaikh',children:[]})
+const node4= new TreeNode({name:'saleh',children:[]})
 
-tree.addChild(node1)
-// tree.addChild(node2)
-// node1.addChild(node3)
-// node3.addChild(node4)
+treeI.addChild(node1)
+ treeI.addChild(node2)
+node1.addChild(node3)
+node1.addChild(node4)
+////////////////////////////JSON DATA////////////////////////////////
+
+const treeII = reactive(new TreeNode());
+// treeII.data.name = "treeII root";
+// treeII.addChild(
+//   {
+//     "name": "khaled",
+//     "children": [
+//       {
+//         "name": "Shaikh",
+//         "children": [],
+//       },
+//       {
+//         "name": "saleh",
+//         "children": [],
+//       },
+      
+//     ],
+//   }
+// );
+// treeII.addChild({ "name": "walied", "children": [] });
 
 
-// console.log(`number of nodes in the root=${tree.totalNodeNumber()}`);
+treeII.addChild(
+  {
+    "name": "khaled",
+    "children": [
+      {
+        "name": "Shaikh0",
+        "children": [],
+      },
+      {
+        "name": "Shaikh2",
+        "children": [],
+      },
+      {
+        "name": "Shaikh3",
+        "children": [{"name": "level3", "children": []}],
+      }
+    ],
+  }
+);
+treeII.addChild({ "name": "walied", "children": [] });
 
 
-// console.log(`tree as flatt array = ${JSON.stringify(tree.flattenArray)}`);
+function buildFancyTree(
+  node: TreeNode,
+  prefix: string = '',
+  isLast: boolean = true
+): string {
+  console.log(
+    prefix + (isLast ? '└── ' : '├── ') + `${node.data.name || 'Unnamed'} (depth=${node.depth})`
+  );
+  let result = prefix + (isLast ? '└── ' : '├── ') + `${node.data.name || 'Unnamed'} (depth=${node.depth}) (IIP=${node.indexInParent}) (DSNT=${node.numDescendants})\n`;
 
+  const children = node.data.children;
+  const childCount = children.length;
 
+  children.forEach((child, index) => {
+    const isLastChild = index === childCount - 1;
+    result += buildFancyTree(
+      child as TreeNode,
+      prefix + (isLast ? '    ' : '│   '),
+      isLastChild
+    );
+  });
 
+  return result;
+}
+const treeIString = ref(''); // create a reactive string to print treeI structure
+const treeIIString = ref(''); // create a reactive string print treeII structure
+const treeIIJson = ref<TNode>() // to store updated JSON
+
+onMounted(() => {
+  treeIString.value = buildFancyTree(treeI);
+  treeIIString.value = buildFancyTree(treeII);
+  treeIIJson.value = treeII.toPureJSON();
+});
+// console.log(buildFancyTree(tree));
 </script>
 
 <template>
   <div>
-    {{ tree.data.name }}<br>
-    number of children={{ tree.data.children.length }}<br><br>
-    FLAT tree in array={{ tree.flattenArray }}<br>
-    <br>
-    <div v-for="(node,index) in tree.data.children" :key="index">{{ !node.data.name?'noName':node.data.name }}</div>
+  TreeI Description<br>
+    <pre>{{ treeIString }}</pre>
+  </div>
+  <hr>
+  <div>
+  TreeII Description<br>
+    <pre>{{ treeIIString }}</pre>
+  </div>
+  <div>
+    <pre>{{ JSON.stringify(treeIIJson, null, 2) }}</pre>
   </div>
 </template>
 
 <style scoped>
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.vue:hover {
-  filter: drop-shadow(0 0 2em #42b883aa);
-}
+
 </style>
