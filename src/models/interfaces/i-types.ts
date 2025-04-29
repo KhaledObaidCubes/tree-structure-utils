@@ -1,9 +1,8 @@
-import type { TreeNode } from "../classes/TreeNode"
-import type { ITreeNode } from "./I-TreeNode"
+import type { TreeNode } from '../classes/TreeNode'
 
-type TNode={
-    name:string,
-    children:TreeNode[]
+type TNode = {
+  name: string
+  children: TreeNode[]
 }
 
-export type{TNode}
+export type { TNode }
