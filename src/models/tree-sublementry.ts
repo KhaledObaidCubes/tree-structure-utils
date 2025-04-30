@@ -79,4 +79,27 @@ const updateNodeDepthsAndIndex = (node: TreeNode, parent: TreeNode) => {
   })
 }
 
-export { addTreeNode, flattTree, getAllChildren, drawTreeWithInfo, drawTree, updateNodeDepthsAndIndex }
+const updateTreeDepth = (node: TreeNode, parent: TreeNode) => {
+  node.depth = parent.depth + 1
+}
+const updateNodesParent = (node: TreeNode) => {
+  node.data.children.forEach(child => {
+    const childNode = child as TreeNode
+    childNode.parentTree = node
+    updateNodesParent(childNode)
+  })
+}
+
+const forVitestUseOnly = (x: number, y: number): number => {
+  if (x == y) {
+    return x * y
+  } else if (x > y) {
+    return x - y * 10
+  } else if (x < y) {
+    return y - x * 100
+  } else {
+    return 55555
+  }
+}
+
+export { addTreeNode, flattTree, getAllChildren, drawTreeWithInfo, drawTree, updateTreeDepth, updateNodesParent, forVitestUseOnly } //updateNodeDepthsAndIndex }

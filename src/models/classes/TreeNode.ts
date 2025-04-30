@@ -1,7 +1,7 @@
 import type { ITreeNode } from '../interfaces/I-TreeNode'
 import type { TNode } from '../interfaces/i-types'
 import { v4 as uuidv4 } from 'uuid'
-import { flattTree, getAllChildren, drawTree, drawTreeWithInfo, updateNodeDepthsAndIndex } from '../tree-sublementry'
+import { flattTree, getAllChildren, drawTree, drawTreeWithInfo, updateTreeDepth, updateNodesParent, forVitestUseOnly } from '../tree-sublementry'
 
 type json = { name: string; children: any[] }
 class TreeNode implements ITreeNode {
@@ -34,50 +34,50 @@ class TreeNode implements ITreeNode {
     this.data.children.push(realNode)
 
     // Based on the parent(this) depth
-    this.updateChildDepthsAndIndex(realNode, this)
+    this.updateChildDepth(realNode, this)
+    this.updateChildParent(realNode)
 
     //update relation in the when addNode function invoked
     this.updateAncestorsDescendants()
   }
 
-  //remove node(child) by its instance name
-  removeSelf() {
-    if (!this.parentTree) {
-      throw new Error('Cannot remove root node')
-    }
-
-    const parent = this.parentTree
-
-    // searching in node's children
-    const index = parent.data.children.findIndex(child => child === this)
-    // -1 when not found
-    if (index === -1) {
-      console.error('NODE DOES NOT EXIST!', {
-        thisNode: this,
-        parentChildren: parent.data.children
-      })
-      throw new Error("Node not found in parent's children")
-    }
-    // remove node object from parent's children
-    parent.data.children.splice(index, 1)
-
-    parent.data.children.forEach((child, idx) => {
-      child.indexInParent = idx
-    })
-
-    parent.updateAncestorsDescendants()
-    this.parentTree = undefined
+  removeNodeFromChildren(treenode: TreeNode) {
+    const foundIndex = this.data.children.findIndex(x => x == treenode)
+    if (foundIndex < 0) throw new Error(`Child ${JSON.stringify(treenode)} is not a Child to be removed!`)
+    this.data.children.splice(foundIndex, 1)
   }
 
+  updateIndexInParentForChildren(startIndex = 0) {
+    const lamda =
+      startIndex == 0
+        ? (child: TreeNode, idx: number) => {
+            ;(child as TreeNode).indexInParent = idx
+          }
+        : (child: TreeNode, idx: number) => {
+            idx > startIndex && ((child as TreeNode).indexInParent = idx)
+          }
+
+    this.data.children.forEach(lamda)
+  }
+
+  /**
+   *
+   * @param tree
+   * Receives a Tree to be removed from this tree.
+   */
+  removeTree(tree: TreeNode) {
+    // get parent..
+    const parent = tree._parentTree
+    //remove this tree from the children of the parent...
+    parent?.removeNodeFromChildren(tree)
+    //sync indices to update after removing a child...
+    parent?.updateIndexInParentForChildren(tree._indexInParent)
+  }
+  ////////////////////////////////////////////////////////////////
+  // remove by index method
   removeByIndex(indx: number) {
-    this.data.children.splice(indx, 1)
-
-    this.data.children.forEach((child, idx) => {
-      ;(child as TreeNode).indexInParent = idx
-    })
-
-    this.updateAncestorsDescendants()
-    this.parentTree = undefined
+    this.removeNodeFromChildren(this.data.children[indx])
+    this.updateIndexInParentForChildren(this.data.children[indx]._indexInParent)
   }
 
   //////////////////////////// REMOVE NODE BY ID ///////////////////////////////
@@ -99,7 +99,7 @@ class TreeNode implements ITreeNode {
     search(this)
 
     if (foundNode) {
-      foundNode.removeSelf()
+      this.removeTree(foundNode)
       return true
     } else {
       console.warn(`Node with id "${idToDelete}" not found.`)
@@ -152,7 +152,7 @@ class TreeNode implements ITreeNode {
     }
 
     // 3. Remove from current parent
-    fromNode.removeSelf()
+    this.removeTree(fromNode)
 
     // 4. Add to new parent
     toNode.addChild(fromNode)
@@ -204,8 +204,11 @@ class TreeNode implements ITreeNode {
   get flattenArray() {
     return flattTree(this)
   }
-  private updateChildDepthsAndIndex(node: TreeNode, parent: TreeNode) {
-    updateNodeDepthsAndIndex(node, parent)
+  private updateChildDepth(node: TreeNode, parent: TreeNode) {
+    updateTreeDepth(node, parent)
+  }
+  private updateChildParent(node: TreeNode) {
+    updateNodesParent(node)
   }
   private updateDescendants() {
     this.numDescendants = getAllChildren(this) - 1
@@ -219,6 +222,9 @@ class TreeNode implements ITreeNode {
       current.updateDescendants()
       current = current.parentTree
     }
+  }
+  vitestStart(h: number, v: number): number {
+    return forVitestUseOnly(h, v)
   }
 }
 

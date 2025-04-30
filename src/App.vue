@@ -26,13 +26,13 @@ node6.addChild(node7)
 
 const infoMode = ref(true)
 const showInfoMSG = ref('SHOW INFO')
+
 const showInfo = () => {
   infoMode.value = !infoMode.value
   showInfoMSG.value = !infoMode.value ? 'SHOW INFO' : 'HIDE INFO'
 }
 // console.log(treeI.data.children.includes(node7))
 // console.log(node6.data.children.includes(node7))
-// const rmv = () => node7.removeSelf()
 const rmv = () => treeI.removeNodeById(document.getElementById('removeText')!.value)
 const moveTo = () => treeI.moveNode(document.getElementById('fromText')!.value, document.getElementById('toText')!.value)
 </script>
