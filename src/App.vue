@@ -1,58 +1,64 @@
 <script setup lang="ts">
-import { reactive } from 'vue'
+import { reactive, ref } from 'vue'
 import { TreeNode } from './models/classes/TreeNode'
-import { ALeveled, BLeveled } from './data/damo'
 
 const treeI = reactive(new TreeNode())
 treeI.data.name = 'treeI root'
-////////////////////////// CREATE NODE INDIVIDUALLY ////////////////////////
-const node1 = new TreeNode({ name: 'khaled', children: [] })
-const node2 = new TreeNode({ name: 'walied', children: [] })
-const node3 = new TreeNode({ name: 'Shaikh', children: [] })
-const node4 = new TreeNode({ name: 'saleh', children: [] })
+const node1 = new TreeNode({ name: '1', id: '', children: [] })
+const node2 = new TreeNode({ name: '2', id: '', children: [] })
+const node3 = new TreeNode({ name: '1.1', id: '', children: [] })
+const node4 = new TreeNode({
+  name: '1.2',
+  id: '',
+  children: [new TreeNode({ name: '1.2.1', id: '', children: [] }), new TreeNode({ name: '1.2.2', id: '', children: [] }), new TreeNode({ name: '1.2.3', id: '', children: [] })]
+})
+const node5 = new TreeNode({ name: '1.3', id: '', children: [] })
+const node6 = new TreeNode({ name: '3', id: '', children: [] })
+const node7 = new TreeNode({ name: '2.1', id: '', children: [] })
 
 treeI.addChild(node1)
 treeI.addChild(node2)
+treeI.addChild(node6)
 node1.addChild(node3)
 node1.addChild(node4)
-////////////////////////////////// JSON DATA ///////////////////////////////
+node1.addChild(node5)
+node6.addChild(node7)
 
-const treeII = reactive(new TreeNode())
-treeII.data.name = 'treeII root'
-// treeII.addChild(
-//   {
-//     "name": "khaled",
-//     "children": [
-//       {
-//         "name": "Shaikh",
-//         "children": [],
-//       },
-//       {
-//         "name": "saleh",
-//         "children": [],
-//       },
-
-//     ],
-//   }
-// );
-// treeII.addChild({ "name": "walied", "children": [] });
-treeII.addChild(ALeveled)
-treeII.addChild(BLeveled)
+const infoMode = ref(true)
+const showInfoMSG = ref('SHOW INFO')
+const showInfo = () => {
+  infoMode.value = !infoMode.value
+  showInfoMSG.value = !infoMode.value ? 'SHOW INFO' : 'HIDE INFO'
+}
+// console.log(treeI.data.children.includes(node7))
+// console.log(node6.data.children.includes(node7))
+// const rmv = () => node7.removeSelf()
+const rmv = () => treeI.removeNodeById(document.getElementById('removeText')!.value)
+const moveTo = () => treeI.moveNode(document.getElementById('fromText')!.value, document.getElementById('toText')!.value)
 </script>
 
 <template>
   <div>
     TreeI Description<br />
-    <pre>{{ treeI.getTreeShape(true) }}</pre>
+    <pre>{{ treeI.getTreeShape(!infoMode) }}</pre>
+    <button @click="showInfo">{{ showInfoMSG }}</button>
   </div>
   <hr />
-  <div>
-    TreeII Description<br />
-    <pre>{{ treeII.getTreeShape(false) }}</pre>
+  <div style="margin-top: 30px; margin-bottom: 30px">
+    <div>REMOVE BY ID:</div>
+    <input type="text" id="removeText" name="rText" placeholder="insert id" style="width: 300px" />
+    <button @click="rmv" style="margin-left: 20px">remove ........</button>
   </div>
-  <div>
-    <pre>{{ JSON.stringify(treeII.toJSONFormat(), null, 2) }}</pre>
+  <hr />
+  <div style="margin-top: 30px; margin-bottom: 30px">
+    <div>MOVE NODE:</div>
+    <input type="text" id="fromText" name="fText" placeholder="insert id" style="width: 300px" />
+    <button @click="moveTo" style="margin-left: 20px">change location</button>
+    <input type="text" id="toText" name="tText" placeholder="insert id" style="margin-left: 20px; width: 300px" />
   </div>
+  <!-- <div>
+    <pre>{{ treeI.getTreeShape(!infoMode) }}</pre>
+  </div> -->
 </template>
 
 <style scoped></style>
