@@ -148,14 +148,14 @@ class TreeNode implements ITreeNode {
         console.warn('Cannot move a node into one of its descendants.')
         return false
       }
-      current = current.parentTree
+      current = (current as TreeNode).parentTree
     }
 
     // 3. Remove from current parent
     this.removeTree(fromNode)
 
     // 4. Add to new parent
-    toNode.addChild(fromNode)
+    ;(toNode as TreeNode).addChild(fromNode as TreeNode)
 
     return true
   }
