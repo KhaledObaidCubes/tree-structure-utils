@@ -1,7 +1,7 @@
 import type { ITreeNode } from '../interfaces/I-TreeNode'
 import type { TNode } from '../interfaces/i-types'
 import { v4 as uuidv4 } from 'uuid'
-import { flattTree, getAllChildren, drawTree, drawTreeWithInfo, updateTreeDepth, updateNodesParent, forVitestUseOnly } from '../tree-sublementry'
+import { flattTree, getAllChildren, drawTree, drawTreeWithInfo, updateTreeDepth, updateNodesParent } from '../tree-sublementry'
 
 type json = { name: string; children: any[] }
 class TreeNode implements ITreeNode {
@@ -72,12 +72,6 @@ class TreeNode implements ITreeNode {
     parent?.removeNodeFromChildren(tree)
     //sync indices to update after removing a child...
     parent?.updateIndexInParentForChildren(tree._indexInParent)
-  }
-  ////////////////////////////////////////////////////////////////
-  // remove by index method
-  removeByIndex(indx: number) {
-    this.removeNodeFromChildren(this.data.children[indx])
-    this.updateIndexInParentForChildren(this.data.children[indx]._indexInParent)
   }
 
   //////////////////////////// REMOVE NODE BY ID ///////////////////////////////
@@ -222,9 +216,6 @@ class TreeNode implements ITreeNode {
       current.updateDescendants()
       current = current.parentTree
     }
-  }
-  vitestStart(h: number, v: number): number {
-    return forVitestUseOnly(h, v)
   }
 }
 

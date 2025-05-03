@@ -31,10 +31,10 @@ const showInfo = () => {
   infoMode.value = !infoMode.value
   showInfoMSG.value = !infoMode.value ? 'SHOW INFO' : 'HIDE INFO'
 }
-// console.log(treeI.data.children.includes(node7))
-// console.log(node6.data.children.includes(node7))
-const rmv = () => treeI.removeNodeById(document.getElementById('removeText')!.value)
-const moveTo = () => treeI.moveNode(document.getElementById('fromText')!.value, document.getElementById('toText')!.value)
+
+const rmv = () => treeI.removeNodeById((document.getElementById('idText') as HTMLInputElement)?.value)
+
+const moveTo = () => treeI.moveNode((document.getElementById('fromText') as HTMLInputElement)?.value, (document.getElementById('toText') as HTMLInputElement)?.value)
 </script>
 
 <template>
@@ -46,7 +46,7 @@ const moveTo = () => treeI.moveNode(document.getElementById('fromText')!.value, 
   <hr />
   <div style="margin-top: 30px; margin-bottom: 30px">
     <div>REMOVE BY ID:</div>
-    <input type="text" id="removeText" name="rText" placeholder="insert id" style="width: 300px" />
+    <input type="text" id="idText" name="rText" placeholder="insert id" style="width: 300px" />
     <button @click="rmv" style="margin-left: 20px">remove ........</button>
   </div>
   <hr />

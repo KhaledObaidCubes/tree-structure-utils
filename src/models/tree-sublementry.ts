@@ -90,16 +90,4 @@ const updateNodesParent = (node: TreeNode) => {
   })
 }
 
-const forVitestUseOnly = (x: number, y: number): number => {
-  if (x == y) {
-    return x * y
-  } else if (x > y) {
-    return x - y * 10
-  } else if (x < y) {
-    return y - x * 100
-  } else {
-    return 55555
-  }
-}
-
-export { addTreeNode, flattTree, getAllChildren, drawTreeWithInfo, drawTree, updateTreeDepth, updateNodesParent, forVitestUseOnly } //updateNodeDepthsAndIndex }
+export { addTreeNode, flattTree, getAllChildren, drawTreeWithInfo, drawTree, updateTreeDepth, updateNodesParent } //updateNodeDepthsAndIndex }
