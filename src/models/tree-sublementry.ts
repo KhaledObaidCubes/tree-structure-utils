@@ -40,8 +40,8 @@ const getAllChildren = (data: TreeNode): number => {
 const drawTreeWithInfo = (node: TreeNode, prefix: string = '', isLast: boolean = true): string => {
   let result: string =
     node.depth == 0 && node.indexInParent == 0
-      ? prefix + (isLast ? '═══ ' : '╠══ ') + `${node.data.name || 'Unnamed'} (depth=${node.depth}) (IIP=${node.indexInParent}) (DSNT=${node.numDescendants}) (totalN=${node.totalNodes})\n`
-      : prefix + (isLast ? '╚══ ' : '╠══ ') + `${node.data.name || 'Unnamed'} (depth=${node.depth}) (IIP=${node.indexInParent}) (DSNT=${node.numDescendants})\n`
+      ? prefix + (isLast ? '═══ ' : '╠══ ') + `${node.data.name || 'Unnamed'} (IIP=${node.indexInParent})\n`
+      : prefix + (isLast ? '╚══ ' : '╠══ ') + `${node.data.name || 'Unnamed'} (IIP=${node.indexInParent})\n`
   const children = node.data.children
   const childCount = children.length
 
@@ -56,7 +56,7 @@ const drawTreeWithInfo = (node: TreeNode, prefix: string = '', isLast: boolean =
 const drawTree = (node: TreeNode, prefix: string = '', isLast: boolean = true): string => {
   let result: string =
     node.depth == 0 && node.indexInParent == 0
-      ? prefix + (isLast ? '─── ' : '├── ') + `${node.data.name || 'Unnamed'}\n`
+      ? prefix + (isLast ? '─── ' : '├── ') + `${node.data.name || 'Unnamed'}[${node.data.id}]\n`
       : prefix + (isLast ? '└── ' : '├── ') + `${node.data.name || 'Unnamed'}[${node.data.id}]\n`
   const children = node.data.children
   const childCount = children.length
@@ -79,9 +79,6 @@ const updateNodeDepthsAndIndex = (node: TreeNode, parent: TreeNode) => {
   })
 }
 
-const updateTreeDepth = (node: TreeNode, parent: TreeNode) => {
-  node.depth = parent.depth + 1
-}
 const updateNodesParent = (node: TreeNode) => {
   node.data.children.forEach(child => {
     const childNode = child as TreeNode
@@ -90,4 +87,4 @@ const updateNodesParent = (node: TreeNode) => {
   })
 }
 
-export { addTreeNode, flattTree, getAllChildren, drawTreeWithInfo, drawTree, updateTreeDepth, updateNodesParent } //updateNodeDepthsAndIndex }
+export { addTreeNode, flattTree, getAllChildren, drawTreeWithInfo, drawTree, updateNodesParent } //updateNodeDepthsAndIndex }

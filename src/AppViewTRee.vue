@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive, ref } from 'vue'
+import { defineAsyncComponent, provide, reactive, ref } from 'vue'
 import { TreeNode } from './models/classes/TreeNode'
 
 const treeI = reactive(new TreeNode())
@@ -25,7 +25,7 @@ node4.addChild(node8)
 node8.addChild(node9)
 
 //----------------- create tree from json directly from data stored in demo-data.ts ---------------------
-
+provide('controller', treeI)
 const infoMode = ref(true)
 const showInfoMSG = ref('SHOW INFO')
 
@@ -37,10 +37,12 @@ const addND = () => treeI.addNodeByID((document.getElementById('addText') as HTM
 const rmv = () => treeI.removeNodeById((document.getElementById('idText') as HTMLInputElement)?.value)
 
 const moveTo = () => treeI.moveNode((document.getElementById('fromText') as HTMLInputElement)?.value, (document.getElementById('toText') as HTMLInputElement)?.value)
+
+const TreeComp = defineAsyncComponent(() => import('./components/tree.vue'))
 </script>
 
 <template>
-  <h3>Instances Tree</h3>
+  <tree-comp :nodes="treeI.toJSONFormat()" />
   <div>
     TREEI created by adding new instances for each node<br />
     <pre>{{ treeI.getTreeShape(!infoMode) }}</pre>

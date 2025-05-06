@@ -1,60 +1,59 @@
 import type { ITreeNode } from '../interfaces/I-TreeNode'
-import type { TNode } from '../interfaces/i-types'
+import type { TNode, TJson } from '../interfaces/i-types'
 import { v4 as uuidv4 } from 'uuid'
-import { flattTree, getAllChildren, drawTree, drawTreeWithInfo, updateTreeDepth, updateNodesParent } from '../tree-sublementry'
+import { flattTree, getAllChildren, drawTree, drawTreeWithInfo, updateNodesParent } from '../tree-sublementry'
 
-type json = { name: string; children: any[] }
 class TreeNode implements ITreeNode {
   data: TNode
   numDescendants: number = 0
   totalNodes: number = 0
+  //Private PRoperties
+  private _depth: number | undefined
+  private _indexInParent: number = 0
+  private _parentTree: TreeNode | undefined //undefined in case it is the root of the tree
 
   //instead of initialize data, a default empty object is passed
-  constructor(nodeToAdd: TNode = { name: '', id: '', children: [] }) {
+  constructor(nodeToAdd: TNode = { name: 'default', id: '000-000-000', children: [] }, depth: number = 0) {
     this.data = {
       name: nodeToAdd.name,
       id: uuidv4(),
       children: []
     }
 
+    this._depth = this._depth ?? depth
+
+    //this function will act as the recursive when adding node(subTree) each time the child have nodes in the children array
     nodeToAdd.children.forEach(x => this.addChild(x))
   }
-  private _depth: number = 0
-  private _indexInParent: number = 0
-  private _parentTree: TreeNode | undefined //undefined in case it is the root of the tree
-  //add new node(child)
+  // Add new node(child)
   addChild(node: TreeNode | TNode) {
-    //node could be created using as an instance of TreeNode or it could be read from JSON object
-    const realNode = node instanceof TreeNode ? node : new TreeNode(node)
+    //To make sure that each child created is instanceof TreeNode
+    const realNode = node instanceof TreeNode ? node : new TreeNode(node, this.depth + 1)
 
-    realNode.indexInParent = this.data.children.length
     realNode.parentTree = this
+    //this step is recommended when adding
+    realNode.depth = this.depth + 1
+    realNode.indexInParent = this.data.children.length
 
-    // Push child
+    // node to its parent children array
     this.data.children.push(realNode)
-
-    // Based on the parent(this) depth
-    this.updateChildDepth(realNode, this)
-    this.updateChildParent(realNode)
-
-    //update relation in the when addNode function invoked
-    this.updateAncestorsDescendants()
   }
 
-  removeNodeFromChildren(treenode: TreeNode) {
-    const foundIndex = this.data.children.findIndex(x => x == treenode)
-    if (foundIndex < 0) throw new Error(`Child ${JSON.stringify(treenode)} is not a Child to be removed!`)
+  removeNodeFromChildren(leaf: TreeNode) {
+    const foundIndex = this.data.children.findIndex(x => x == leaf)
+    if (foundIndex < 0) throw new Error(`Child ${JSON.stringify(leaf)} is not a Child to be removed!`)
     this.data.children.splice(foundIndex, 1)
   }
 
   updateIndexInParentForChildren(startIndex = 0) {
+    console.log(this.data.children)
     const lamda =
       startIndex == 0
         ? (child: TreeNode, idx: number) => {
             ;(child as TreeNode).indexInParent = idx
           }
         : (child: TreeNode, idx: number) => {
-            idx > startIndex && ((child as TreeNode).indexInParent = idx)
+            idx >= startIndex && ((child as TreeNode).indexInParent = idx)
           }
 
     this.data.children.forEach(lamda)
@@ -77,21 +76,17 @@ class TreeNode implements ITreeNode {
   //////////////////////////// REMOVE NODE BY ID ///////////////////////////////
   removeNodeById(idToDelete: string): boolean {
     let foundNode: TreeNode | undefined
-
     function search(node: TreeNode) {
       if (node.data.id === idToDelete) {
         foundNode = node
         return
       }
-
       for (const child of node.data.children) {
         search(child as TreeNode)
         if (foundNode) return // Stop once found
       }
     }
-
     search(this)
-
     if (foundNode) {
       this.removeTree(foundNode)
       return true
@@ -105,60 +100,59 @@ class TreeNode implements ITreeNode {
   moveNode(fromID: string, toID: string): boolean {
     let fromNode: TreeNode | undefined = undefined
     let toNode: TreeNode | undefined = undefined
-
-    function search(node: TreeNode) {
+    const stack: TreeNode[] = [this]
+    while (stack.length && (!fromNode || !toNode)) {
+      const node = stack.pop()!
       if (node.data.id === fromID) fromNode = node
       if (node.data.id === toID) toNode = node
 
-      if (fromNode && toNode) return
-
-      node.data.children.forEach(child => {
-        search(child as TreeNode)
-      })
+      for (const child of node.data.children) {
+        stack.push(child as TreeNode)
+      }
     }
-
-    // 1. Find both nodes
-    search(this)
-
-    if (!fromNode || !toNode) {
-      console.warn('fromNode or toNode not found.')
+    if (!fromNode || !toNode || fromNode === this || fromNode === toNode) {
+      console.warn('Invalid move: node not found, moving root, or self move.')
       return false
     }
-    // this can't be done because root hase no id yet
-    if (fromNode === this) {
-      console.warn('Cannot move root node.')
-      return false
-    }
-
-    if (fromNode === toNode) {
-      console.warn('Cannot move a node into itself.')
-      return false
-    }
-
-    // 2. Prevent cycles (can't move a node inside one of its descendants)
     let current: TreeNode | undefined = toNode
     while (current) {
       if (current === fromNode) {
         console.warn('Cannot move a node into one of its descendants.')
         return false
       }
-      current = (current as TreeNode).parentTree
+      current = current.parentTree
     }
+    fromNode.parentTree?.removeNodeFromChildren(fromNode)
+    fromNode.parentTree?.updateIndexInParentForChildren(fromNode.indexInParent)
+    toNode.addChild(fromNode)
+    return true
+  }
+  //////////////////// ADD NODE BY ID /////////////
 
-    // 3. Remove from current parent
-    this.removeTree(fromNode)
+  addNodeByID(toID: string, leaf: TreeNode): boolean {
+    let toNode: TreeNode | undefined = undefined
+    const stack: TreeNode[] = [this]
+    while (stack.length && !toNode) {
+      const node = stack.pop()!
+      if (node.data.id === toID) toNode = node
 
-    // 4. Add to new parent
-    ;(toNode as TreeNode).addChild(fromNode as TreeNode)
-
+      for (const child of node.data.children) {
+        stack.push(child as TreeNode)
+      }
+    }
+    if (!toNode) {
+      console.warn('Invalid move: node not found, moving root, or self move.')
+      return false
+    }
+    toNode.addChild(leaf)
     return true
   }
 
   /////////////////////////////////////////////////
 
   // return tree as JSON
-  toJSONFormat(): json {
-    return { name: this.data.name, children: this.data.children.map(x => x.toJSONFormat()) }
+  toJSONFormat(): TJson {
+    return { name: this.data.name, id: this.data.id, depth: this._depth, indexInParent: this.indexInParent, children: this.data.children.map(x => x.toJSONFormat()) }
   }
 
   totalNodeNumber(): number {
@@ -177,7 +171,7 @@ class TreeNode implements ITreeNode {
     this._depth = value
   }
   get depth() {
-    return this._depth
+    return (this._depth = this._depth ?? this.depth)
   }
 
   set indexInParent(value: number) {
@@ -198,9 +192,7 @@ class TreeNode implements ITreeNode {
   get flattenArray() {
     return flattTree(this)
   }
-  private updateChildDepth(node: TreeNode, parent: TreeNode) {
-    updateTreeDepth(node, parent)
-  }
+
   private updateChildParent(node: TreeNode) {
     updateNodesParent(node)
   }

@@ -6,4 +6,12 @@ type TNode = {
   children: TreeNode[]
 }
 
-export type { TNode }
+type TJson = {
+  name: string
+  id: string
+  depth: number | undefined
+  indexInParent: number
+  children: any[]
+}
+
+export type { TNode, TJson }
