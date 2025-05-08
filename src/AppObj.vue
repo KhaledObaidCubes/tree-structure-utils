@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
 import { TreeNode } from './models/classes/TreeNode'
-import { ALeveled } from './data/demo-data'
+import { treeAlpha } from './data/demo-data'
 
 //----------------- create tree from json directly from data stored in demo-data.ts ---------------------
-const treeII = reactive(new TreeNode(ALeveled))
+const treeII = reactive(new TreeNode(treeAlpha))
 treeII.data.name = 'treeII root'
 
 const infoMode = ref(true)

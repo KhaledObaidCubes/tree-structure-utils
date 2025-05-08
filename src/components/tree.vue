@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <h3 class="cation">
-      <span @click="">{{ nodes?.name + ' ' + nodes?.depth + ' ' }}</span>
+      <span @click="thereIsNodeUP(nodes?.id)">{{ nodes?.id }} </span>
       <input v-if="nodes?.children.length" type="button" :value="expand ? '-' : '+'" @click="toggle" />
       <button @click="player!.addNodeByID(nodes?.id, new TreeNode({ name: 'KhaledOBJ', id: '0', children: [] }))">ADD</button>
       <button v-if="!!nodes?.depth || !!nodes?.indexInParent" @click="player!.removeNodeById(nodes?.id)">DELETE</button>
@@ -22,6 +22,10 @@ const toggle = () => (expand.value = !expand.value)
 const child = defineAsyncComponent(() => import('../components/tree.vue'))
 
 const player = inject<TreeNode>('controller')
+
+const thereIsNodeUP = (id: string) => {
+  player!.toMoveID = id
+}
 </script>
 <style scoped>
 .container {

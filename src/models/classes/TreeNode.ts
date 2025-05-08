@@ -5,7 +5,9 @@ import { flattTree, getAllChildren, drawTree, drawTreeWithInfo, updateNodesParen
 
 class TreeNode implements ITreeNode {
   data: TNode
-  numDescendants: number = 0
+  toMoveID?: string | undefined
+  targetID?: string | undefined
+  numDescendants: string[] = []
   totalNodes: number = 0
   //Private PRoperties
   private _depth: number | undefined
@@ -13,7 +15,7 @@ class TreeNode implements ITreeNode {
   private _parentTree: TreeNode | undefined //undefined in case it is the root of the tree
 
   //instead of initialize data, a default empty object is passed
-  constructor(nodeToAdd: TNode = { name: 'default', id: '000-000-000', children: [] }, depth: number = 0) {
+  constructor(nodeToAdd: TNode = { name: 'DefaultName', id: '000-000-000', children: [] }, depth: number = 0) {
     this.data = {
       name: nodeToAdd.name,
       id: uuidv4(),
@@ -37,6 +39,7 @@ class TreeNode implements ITreeNode {
 
     // node to its parent children array
     this.data.children.push(realNode)
+    realNode.numDescendants = this.descendentArray(this)
   }
 
   removeNodeFromChildren(leaf: TreeNode) {
@@ -46,7 +49,6 @@ class TreeNode implements ITreeNode {
   }
 
   updateIndexInParentForChildren(startIndex = 0) {
-    console.log(this.data.children)
     const lamda =
       startIndex == 0
         ? (child: TreeNode, idx: number) => {
@@ -124,6 +126,7 @@ class TreeNode implements ITreeNode {
     }
     fromNode.parentTree?.removeNodeFromChildren(fromNode)
     fromNode.parentTree?.updateIndexInParentForChildren(fromNode.indexInParent)
+
     toNode.addChild(fromNode)
     return true
   }
@@ -197,8 +200,9 @@ class TreeNode implements ITreeNode {
     updateNodesParent(node)
   }
   private updateDescendants() {
-    this.numDescendants = getAllChildren(this) - 1
-    this.totalNodes = getAllChildren(this)
+    //this.numDescendants = getAllChildren(this) - 1
+    //the total node should be only on the root (all nodes including root)
+    //this.totalNodes = getAllChildren(this)
   }
 
   private updateAncestorsDescendants() {
@@ -208,6 +212,22 @@ class TreeNode implements ITreeNode {
       current.updateDescendants()
       current = current.parentTree
     }
+  }
+  descendentArray(node: TreeNode) {
+    let desndncArr: string[] = []
+    //add children to the array
+    desndncArr = node.data.children.map(child => child.data.name)
+    // count self node
+    desndncArr.push(node.data.name)
+    function addParentName(node: TreeNode) {
+      if (node.parentTree) {
+        desndncArr.push(node.parentTree.data.name)
+        addParentName(node.parentTree)
+      }
+    }
+    addParentName(node)
+    return desndncArr
+    //return node.parentTree?.data.name
   }
 }
 

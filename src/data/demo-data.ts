@@ -1,6 +1,6 @@
 import type { TNode } from '../models/interfaces/i-types'
 
-const ALeveled: TNode = {
+const treeAlpha: TNode = {
   name: 'ob treeI root',
   id: '0',
   children: [
@@ -56,7 +56,7 @@ const ALeveled: TNode = {
   ]
 }
 
-const BLeveled = {
+const treeBeta = {
   name: 'ob B',
   id: '0',
   children: [
@@ -86,4 +86,26 @@ const BLeveled = {
   ]
 }
 
-export { ALeveled, BLeveled }
+const treeGamma: TNode = {
+  name: 'ob treeI root',
+  id: '0',
+  children: [
+    {
+      name: 'child1',
+      id: '',
+      children: [
+        { name: 'child11', id: '', children: [] },
+        { name: 'child12', id: '', children: [] }
+      ]
+    },
+    {
+      name: 'child1',
+      id: '',
+      children: [
+        { name: 'child21', id: '', children: [] },
+        { name: 'child22', id: '', children: [] }
+      ]
+    }
+  ]
+}
+export { treeAlpha, treeBeta, treeGamma }
