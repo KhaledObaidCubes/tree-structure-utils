@@ -39,7 +39,7 @@ class TreeNode implements ITreeNode {
 
     // node to its parent children array
     this.data.children.push(realNode)
-    realNode.numDescendants = this.descendentArray(this)
+    this.numDescendants = this.descendentArray(this)
   }
 
   removeNodeFromChildren(leaf: TreeNode) {
@@ -73,6 +73,28 @@ class TreeNode implements ITreeNode {
     parent?.removeNodeFromChildren(tree)
     //sync indices to update after removing a child...
     parent?.updateIndexInParentForChildren(tree._indexInParent)
+  }
+
+  //////////////////////////// update NODE name BY ID ///////////////////////////////
+  updateNodeNameById(idToGet: string, newName: string) {
+    let foundNode: TreeNode | undefined
+    function search(node: TreeNode) {
+      if (node.data.id === idToGet) {
+        foundNode = node
+        return
+      }
+      for (const child of node.data.children) {
+        search(child as TreeNode)
+        if (foundNode) return // Stop once found
+      }
+    }
+    search(this)
+    if (foundNode) {
+      foundNode.data.name = newName
+    } else {
+      console.warn(`Node with id "${idToGet}" not found.`)
+      return
+    }
   }
 
   //////////////////////////// REMOVE NODE BY ID ///////////////////////////////
