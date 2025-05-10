@@ -5,7 +5,7 @@ const treeAlpha: TNode = {
   id: '0',
   children: [
     {
-      name: 'ob 1',
+      name: '1',
       id: '0',
       children: [
         {
@@ -13,11 +13,11 @@ const treeAlpha: TNode = {
           id: '0',
           children: [
             {
-              name: 'ob 1.1.1',
+              name: '1.1.1',
               id: '0',
               children: [
                 {
-                  name: 'ob 1.1.1.1',
+                  name: '1.1.1.1',
                   id: '0',
                   children: []
                 }
