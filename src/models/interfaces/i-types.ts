@@ -14,4 +14,10 @@ type TJson = {
   children: any[]
 }
 
-export type { TNode, TJson }
+type TTreeJson = {
+  [key: string]: any
+  children: TTreeJson[]
+}
+
+type TCheckedTree = { checked: boolean }
+export type { TNode, TJson, TTreeJson, TCheckedTree }

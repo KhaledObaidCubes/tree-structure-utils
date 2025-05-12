@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { defineAsyncComponent, provide, reactive, ref, watch } from 'vue'
-import { TreeNode } from './models/classes/TreeNode'
+import { defineAsyncComponent, provide, reactive, watch } from 'vue'
+import { TreeNode } from '../models/classes/TreeNode'
 
 const treeI = reactive(new TreeNode())
 treeI.data.name = 'ROOT'
@@ -30,11 +30,11 @@ watch(
   }
 )
 
-const TreeComp = defineAsyncComponent(() => import('./components/tree.vue'))
+const TreeComp = defineAsyncComponent(() => import('../components/tree.vue'))
 </script>
 
 <template>
-  <h3>\\{{ treeI.toMoveID }}</h3>
+  <h3>AS TREENODE INSTANCE</h3>
   <tree-comp :nodes="treeI.toJSONFormat()" />
 
   <!-- <div>

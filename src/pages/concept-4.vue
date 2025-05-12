@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { defineAsyncComponent, provide, reactive, ref } from 'vue'
-import { TreeNode } from './models/classes/TreeNode'
+import { TreeNode } from '../models/classes/TreeNode'
 
 const treeI = reactive(new TreeNode())
 treeI.data.name = 'treeI root'
@@ -38,7 +38,7 @@ const rmv = () => treeI.removeNodeById((document.getElementById('idText') as HTM
 
 const moveTo = () => treeI.moveNode((document.getElementById('fromText') as HTMLInputElement)?.value, (document.getElementById('toText') as HTMLInputElement)?.value)
 
-const TreeComp = defineAsyncComponent(() => import('./components/tree.vue'))
+const TreeComp = defineAsyncComponent(() => import('../components/tree.vue'))
 </script>
 
 <template>
