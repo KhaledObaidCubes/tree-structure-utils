@@ -19,5 +19,5 @@ type TTreeJson = {
   children: TTreeJson[]
 }
 
-type TCheckedTree = { checked: boolean }
+type TCheckedTree = { checked: boolean; indeterminate: boolean }
 export type { TNode, TJson, TTreeJson, TCheckedTree }

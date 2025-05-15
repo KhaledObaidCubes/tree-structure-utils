@@ -15,10 +15,11 @@
         id="ABC"
         name="ABC"
         value="ABC"
-        :checked="nodes?.data.checked"
-        :indeterminate="nodes?.data.indeterminate"
-        @click="nodes.checkBoxController(nodes)"
+        :checked="nodes?.checked"
+        :indeterminate="nodes.indeterminate"
+        @change="(e) => nodes!.checkMe(e.target.checked)"
       />
+      {{ nodes.data.checked }}
     </h3>
     <child v-if="expand" v-for="(child, _index) in nodes?.children" :nodes="child" :key="_index" />
   </div>
