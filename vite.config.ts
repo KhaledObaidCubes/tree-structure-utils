@@ -9,6 +9,14 @@ export default defineConfig({
     lib: {
       entry: resolve(__dirname, 'src/shared.ts'),
       formats: ['es']
+    },
+    rollupOptions: {
+      external: ['vue'],
+      output: {
+        globals: {
+          vue: 'Vue'
+        }
+      }
     }
   }
 })
