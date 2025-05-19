@@ -1,6 +1,4 @@
-import type { TNode } from '../models/interfaces/i-types'
-
-const treeAlpha: TNode = {
+const treeAlpha: any = {
   name: 'ob treeI root',
   id: '0',
   children: [
@@ -86,7 +84,7 @@ const treeBeta = {
   ]
 }
 
-const treeGamma: TNode = {
+const treeGamma: any = {
   name: 'ob treeI root',
   id: '0',
   children: [

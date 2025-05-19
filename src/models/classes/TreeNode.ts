@@ -1,7 +1,7 @@
 import type { ITreeNode } from '../interfaces/I-TreeNode'
 import type { TNode, TJson } from '../interfaces/i-types'
 import { v4 as uuidv4 } from 'uuid'
-import { flattTree, getAllChildren, drawTree, drawTreeWithInfo, updateNodesParent } from '../tree-sublementry'
+import { flattTree, getAllChildren, drawTree, drawTreeWithInfo } from '../tree-sublementry'
 
 class TreeNode implements ITreeNode {
   data: TNode
@@ -218,23 +218,23 @@ class TreeNode implements ITreeNode {
     return flattTree(this)
   }
 
-  private updateChildParent(node: TreeNode) {
-    updateNodesParent(node)
-  }
-  private updateDescendants() {
-    //this.numDescendants = getAllChildren(this) - 1
-    //the total node should be only on the root (all nodes including root)
-    //this.totalNodes = getAllChildren(this)
-  }
+  // private updateChildParent(node: TreeNode) {
+  //   updateNodesParent(node)
+  // }
+  // private updateDescendants() {
+  //this.numDescendants = getAllChildren(this) - 1
+  //the total node should be only on the root (all nodes including root)
+  //this.totalNodes = getAllChildren(this)
+  // }
 
-  private updateAncestorsDescendants() {
-    let current: TreeNode | undefined = this
-    while (current) {
-      current
-      current.updateDescendants()
-      current = current.parentTree
-    }
-  }
+  // private updateAncestorsDescendants() {
+  //   let current: TreeNode | undefined = this
+  //   while (current) {
+  //     current
+  //     current.updateDescendants()
+  //     current = current.parentTree
+  //   }
+  // }
   descendentArray(node: TreeNode) {
     let desndncArr: string[] = []
     //add children to the array

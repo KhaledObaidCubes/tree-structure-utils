@@ -17,9 +17,8 @@
         value="ABC"
         :checked="nodes?.checked"
         :indeterminate="nodes.indeterminate"
-        @change="(e) => nodes!.checkMe(e.target.checked)"
+        @change="(e) => nodes!.checkMe((e.target as HTMLInputElement).checked)"
       />
-      {{ nodes.data.checked }}
     </h3>
     <child v-if="expand" v-for="(child, _index) in nodes?.children" :nodes="child" :key="_index" />
   </div>

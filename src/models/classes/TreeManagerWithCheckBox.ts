@@ -12,16 +12,13 @@ export class TreeManagerWithCheckBox<T extends TCheckedTree> extends TreeManager
 
   public get indeterminate(): boolean {
     if (!this.children.length) return false
-    this.data.indeterminate =
-      this.children.some((c: any) => c.indeterminate) || (this.children.some((c: any) => c.data.checked) && this.children.filter((c: any) => c.data.checked).length != this.children.length)
 
-    return this.data.indeterminate
+    return this.children.some((c: any) => c.indeterminate) || (this.children.some((c: any) => c.data.checked) && this.children.filter((c: any) => c.data.checked).length != this.children.length)
   }
 
   public get checked(): boolean {
     if (!this.children.length) return this.data.checked
-    this.data.checked = this.data.checked || (this.children?.every((c: any) => c.checked) && !this.data.indeterminate)
-    return this.data.checked
+    return this.data.checked || (this.children?.every((c: any) => c.checked) && !this.data.indeterminate)
   }
 
   checkMe(checked: boolean) {

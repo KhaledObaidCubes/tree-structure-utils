@@ -30,12 +30,12 @@ const thereIsNodeUP = (id: string) => {
   player!.toMoveID = id
 }
 
-let idToChange: string = ''
+const idToChange = ref('')
 const setEditName = () => {
   if (nodes.value) {
     // document.getElementById('').va
     childName.value = nodes.value.name
-    idToChange = nodes.value.id
+    idToChange.value = nodes.value.id
 
     let person = prompt('New Node name:', nodes.value.name)
     person == null || person == '' ? player?.updateNodeNameById(nodes.value.id, nodes.value.name) : player?.updateNodeNameById(nodes.value.id, person as string)

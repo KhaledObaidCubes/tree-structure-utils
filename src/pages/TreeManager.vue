@@ -1,24 +1,23 @@
 <script setup lang="ts">
 import { defineAsyncComponent, reactive } from 'vue'
-import { TreeManager } from '../models/classes/TreeManager'
 import { TreeManagerWithCheckBox } from '../models/classes/TreeManagerWithCheckBox'
 
 //const treeI = reactive(new TreeManager(treeGamma))
-const treeI = reactive(new TreeManagerWithCheckBox({ name: 'root', idooo: '', children: [] }))
+const treeI = reactive(new TreeManagerWithCheckBox({ name: 'root', idooo: '', checked: false, indeterminate: false, children: [] }))
 
 //----------------- create tree from json directly from data stored in demo-data.ts ---------------------
 
 // const root = new TreeManager<MyDataType>(myRootData)
-const child = new TreeManagerWithCheckBox({ name: 'a1', idooo: '', checked: false, children: [] })
-const child2 = new TreeManagerWithCheckBox({ name: 'a2', idooo: '', checked: false, children: [] })
-const child3 = new TreeManagerWithCheckBox({ name: 'a3', idooo: '', checked: false, children: [] })
-const child4 = new TreeManagerWithCheckBox({ name: 'a4', idooo: '', checked: false, children: [] })
-const child5 = new TreeManagerWithCheckBox({ name: 'a5', idooo: '', checked: false, children: [] })
+const child = new TreeManagerWithCheckBox({ name: 'a1', idooo: '', checked: false, indeterminate: false, children: [] })
+const child2 = new TreeManagerWithCheckBox({ name: 'a2', idooo: '', checked: false, indeterminate: false, children: [] })
+const child3 = new TreeManagerWithCheckBox({ name: 'a3', idooo: '', checked: false, indeterminate: false, children: [] })
+const child4 = new TreeManagerWithCheckBox({ name: 'a4', idooo: '', checked: false, indeterminate: false, children: [] })
+const child5 = new TreeManagerWithCheckBox({ name: 'a5', idooo: '', checked: false, indeterminate: false, children: [] })
 
-const child6 = new TreeManagerWithCheckBox({ name: 'a6', idooo: '', checked: false, children: [] })
-const child7 = new TreeManagerWithCheckBox({ name: 'a7', idooo: '', checked: false, children: [] })
-const child8 = new TreeManagerWithCheckBox({ name: 'a8', idooo: '', checked: false, children: [] })
-const child9 = new TreeManagerWithCheckBox({ name: 'a9', idooo: '', checked: false, children: [] })
+const child6 = new TreeManagerWithCheckBox({ name: 'a6', idooo: '', checked: false, indeterminate: false, children: [] })
+const child7 = new TreeManagerWithCheckBox({ name: 'a7', idooo: '', checked: false, indeterminate: false, children: [] })
+const child8 = new TreeManagerWithCheckBox({ name: 'a8', idooo: '', checked: false, indeterminate: false, children: [] })
+const child9 = new TreeManagerWithCheckBox({ name: 'a9', idooo: '', checked: false, indeterminate: false, children: [] })
 
 child.addNodeInstance(child2)
 child.addNodeInstance(child3)
