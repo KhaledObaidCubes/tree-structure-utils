@@ -1,10 +1,11 @@
-import type { ITreeNode } from './models/interfaces/I-TreeNode'
-import type { ITreeManager } from './models/interfaces/I-TreeManager'
+export type { ITreeManager } from './domain/meta/i-tree-manager'
 
-import type { TNode, TJson, TTreeJson, TCheckedTree } from './models/interfaces/i-types'
-export type { TNode, TJson, TTreeJson, TCheckedTree, ITreeManager, ITreeNode }
+import { App, defineAsyncComponent } from 'vue'
 
-import { TreeManager } from './models/classes/TreeManager'
-import { TreeManagerWithCheckBox } from './models/classes/TreeManagerWithCheckBox'
+import { TreeManager } from './domain/TreeManager'
 
-export { TreeManager, TreeManagerWithCheckBox }
+const install = (app:App<Element>)=>{
+    app.component('VTree',defineAsyncComponent(()=>import('./components/Tree.vue')))
+}
+    
+export { TreeManager , install}
