@@ -1,17 +1,18 @@
-import type { ITreeManager } from '../interfaces/I-TreeManager'
-export class TreeManager<T> {
+import type { ITreeManager } from './meta/i-tree-manager'
+export class TreeManager<T > {
   data: ITreeManager<T>
   parent?: TreeManager<T>
   children: TreeManager<T>[] = []
   depth = 0
   toMoveID?: string | undefined
 
-  constructor(data: ITreeManager<T>) {
-    this.data = data
-    this.buildTree(data)
+  constructor(data?: ITreeManager<T>) {
+    this.data = data??{} as ITreeManager<T>
+    this.buildTree(this.data)
   }
 
   private buildTree(data: ITreeManager<T>) {
+    if(!data.children) return
     for (const childData of data.children) {
       const childNode = new TreeManager<T>(childData)
       childNode.parent = this

@@ -1,64 +1,32 @@
 <template>
-  <div class="container">
-    <h3 class="caption">
-      <span @click="thereIsNodeUP(nodes?.id)">{{ nodes?.name }}</span>
-      <input v-if="nodes?.children.length" type="button" :value="expand ? '-' : '+'" @click="toggle" />
-      <button @click="player!.addNodeByID(nodes?.id, new TreeNode({ name: 'gggg', id: '0', children: [] }))">ADD</button>
-      <button v-if="!!nodes?.depth || !!nodes?.indexInParent" @click="player!.removeNodeById(nodes?.id)">DELETE</button>
-      <button v-if="!!nodes?.depth || !!nodes?.indexInParent" @click="setEditName">
-        <img src="../assets/icons/edit.png" alt="" width="10px" />
-      </button>
-    </h3>
-
-    <child v-if="expand" v-for="(child, _index) in nodes?.children" :nodes="child" :key="_index" :index="+_index" />
+  <div class="tree-node">
+    <slot :node="manager"></slot>
+    <Tree v-for="(child, index) in manager.children" :manager="child" :key="index">
+      <template #default="slotProps">
+        <slot v-bind="slotProps" />
+      </template>
+    </Tree>
   </div>
 </template>
 
-<script setup lang="ts">
-import { TreeNode } from '../models/classes/TreeNode'
-import { defineAsyncComponent, inject, ref, toRef } from 'vue'
-import { props as treeContent } from '../components/tree'
+<script setup lang="ts" generic="T">
+import { TreeManager } from '@/shared'
 
-const props = defineProps(treeContent)
-const nodes = toRef(props, 'nodes')
-const expand = ref(true)
-const toggle = () => (expand.value = !expand.value)
-const player = inject<TreeNode>('controller')
-const childName = ref('')
+const props = defineProps<{
+  manager: TreeManager<T>
+}>()
 
-const thereIsNodeUP = (id: string) => {
-  player!.toMoveID = id
-}
+// Infer the actual data type from TreeManager
+type TreeDataType = typeof props.manager extends TreeManager<infer T> ? T : never
 
-const idToChange = ref('')
-const setEditName = () => {
-  if (nodes.value) {
-    // document.getElementById('').va
-    childName.value = nodes.value.name
-    idToChange.value = nodes.value.id
+defineSlots<{
+  default(props: { node: TreeManager<TreeDataType> }): any
+}>()
 
-    let person = prompt('New Node name:', nodes.value.name)
-    person == null || person == '' ? player?.updateNodeNameById(nodes.value.id, nodes.value.name) : player?.updateNodeNameById(nodes.value.id, person as string)
-  }
-}
-const child = defineAsyncComponent(() => import('../components/tree.vue'))
+// const Node = defineAsyncComponent(() => import('../components/Tree.vue'))
 </script>
 <style scoped>
-.container {
-  margin: 10px 0 0 40px;
-  text-align: justify;
-  font-family: Verdana, Geneva, Tahoma, sans-serif;
-}
-h3,
-h4 {
-  margin: 0px;
-}
-.caption {
-  border: 1px solid transparent;
-}
-
-.caption:hover {
-  background: #272626;
-  /* border: 1px solid #d0d0d0; */
+.tree-node {
+  padding-left: 10px;
 }
 </style>
