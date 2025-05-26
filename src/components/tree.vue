@@ -1,23 +1,27 @@
 <template>
-  <div class="tree-node">
-    <slot :node="manager"></slot>
-    <Tree v-for="(child, index) in manager.children" :manager="child" :key="index">
+  <Component :is="tag" class="tree-node">
+    <slot :node="treeManager"></slot>
+    <Tree v-for="(child, index) in treeManager.children" :treeManager="child" :tag :key="index">
       <template #default="slotProps">
         <slot v-bind="slotProps" />
       </template>
     </Tree>
-  </div>
+  </Component>
 </template>
 
 <script setup lang="ts" generic="T">
 import { TreeManager } from '@/shared'
 
-const props = defineProps<{
-  manager: TreeManager<T>
-}>()
+const props = withDefaults(
+  defineProps<{
+    tag?: string
+    treeManager: TreeManager<T>
+  }>(),
+  { tag: 'div' }
+)
 
 // Infer the actual data type from TreeManager
-type TreeDataType = typeof props.manager extends TreeManager<infer T> ? T : never
+type TreeDataType = typeof props.treeManager extends TreeManager<infer T> ? T : never
 
 defineSlots<{
   default(props: { node: TreeManager<TreeDataType> }): any

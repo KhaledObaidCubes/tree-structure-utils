@@ -4,7 +4,7 @@ export class TreeManager<T > {
   parent?: TreeManager<T>
   children: TreeManager<T>[] = []
   depth = 0
-  toMoveID?: string | undefined
+ 
 
   constructor(data?: ITreeManager<T>) {
     this.data = data??{} as ITreeManager<T>
@@ -104,4 +104,11 @@ export class TreeManager<T > {
       children: this.children.map(child => child.toJSONFormat())
     }
   }
+ getParentChain(){
+  const p = [] as any[]
+  if(!this.parent) return p
+  p.push ( ...this.parent.getParentChain(),this.parent )
+  return p
+ }
+
 }
