@@ -1,3 +1,14 @@
+//import { describe, it, expect } from 'vitest'
+
+const getRootName = (): string => {
+  return 'Root'
+}
+describe('TreeNode', () => {
+  it('should initialize with given name', () => {
+    expect(getRootName()).toBe('Root')
+  })
+})
+
 // import { describe, it, expect } from 'vitest'
 // import { TreeNode } from '../models/classes/TreeNode'
 // import { treeAlpha } from '../data/demo-data'

@@ -29,17 +29,16 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "newLine": "lf",
-    "types": ["node", "vue"],
+    "types": ["node", "vue", "vitest/globals"],
     "lib": ["es5", "es6", "dom", "es2020.promise"],
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"],
-      "@app/*": ["src/app/*"],
-    
+      "@app/*": ["src/app/*"]
     }
   },
   "files": ["./vue-shims.d.ts"],
   "include": ["src", "src/**/*", "src/**/*.ts", "globals.d.ts", "src/**/*.vue", "src/**/*.d.ts"],
-  "exclude": ["node_modules", "**/__tests__/*","src/pages"],
+  "exclude": ["node_modules", "**/__tests__/*", "src/pages"],
   "compileOnSave": false
 }

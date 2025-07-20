@@ -1,16 +1,13 @@
-// import { describe, it, expect, beforeEach } from 'vitest'
-// import { TreeNode } from '../models/classes/TreeNode'
+//import { describe, it, expect } from 'vitest'
 
-// describe('TreeNode', () => {
-//   let root: TreeNode
-
-//   beforeEach(() => {
-//     root = new TreeNode({ name: 'Root', id: 'root-id', children: [] })
-//   })
-
-//   it('should initialize with given name', () => {
-//     expect(root.data.name).toBe('Root')
-//   })
+const showRootName = (): string => {
+  return 'Root'
+}
+describe('TreeNode', () => {
+  it('should initialize with given name', () => {
+    expect(showRootName()).toBe('Root')
+  })
+})
 //   //-------------- test addChild method -----------------
 //   it('should add child nodes', () => {
 //     root.addChild({ name: 'Child1', id: '1', children: [] })

@@ -1,114 +1,145 @@
-import type { ITreeManager } from './meta/i-tree-manager'
-export class TreeManager<T > {
-  data: ITreeManager<T>
-  parent?: TreeManager<T>
-  children: TreeManager<T>[] = []
-  depth = 0
- 
+import type { ITree } from './meta/i-tree'
+import { Ref, ref, shallowReactive } from 'vue'
+const syncRootState = <T>(node: TreeManager<T>) => {
+  const root = getParentChain(node)[0] ?? node
+  root.children?.map(child => child.state.value)
+}
 
-  constructor(data?: ITreeManager<T>) {
-    this.data = data??{} as ITreeManager<T>
-    this.buildTree(this.data)
-  }
+const updateIndices = <T>(node: TreeManager<T>, start = 0) => node.children?.forEach((x, i) => i >= start && (x.index = i))
 
-  private buildTree(data: ITreeManager<T>) {
-    if(!data.children) return
-    for (const childData of data.children) {
-      const childNode = new TreeManager<T>(childData)
-      childNode.parent = this
-      childNode.depth = this.depth + 1
-      this.children.push(childNode)
+const setDepth = <T>(node: TreeManager<T>) => {
+  node.depth = node.parent ? node.parent.depth + 1 : 0 //check if it was on root the depth will be 0 other wise it will be the parent's depth +1
+  node.children?.forEach(setDepth) //recursive setDepth on all node's children
+}
+
+const toJSON = <T>(node: TreeManager<T>): ITree<T> => ({ ...node.state.value, children: node.children?.map(toJSON) })
+
+const addNode = <T>(owner: TreeManager<T>, data: ITree<T> | TreeManager<T>, index = -1, isInit = false): TreeManager<T> => {
+  const newNode = data instanceof TreeManager ? data : new (owner as any)['constructor'](data)
+
+  owner.state.value.children ??= []
+  if (index >= 0) {
+    newNode.index = index
+    owner.state.value.children.splice(index, isInit ? 1 : 0, newNode.state.value)
+    owner.children.splice(index, isInit ? 1 : 0, newNode)
+    !isInit && updateIndices(owner, index)
+  } else if (index === -1) {
+    newNode.index = owner.state.value.children?.length || 0
+    if (!isInit) {
+      owner.state.value.children.push(newNode.state.value)
+      owner.children.push(newNode)
     }
   }
 
-  addNode(data: ITreeManager<T>): TreeManager<T> {
-    const newNode = new TreeManager<T>(data)
-    newNode.parent = this
-    newNode.depth = this.depth + 1
-    this.children.push(newNode)
-    return newNode
-  }
+  newNode.parent = owner
 
-  //----------------------- add node that doesn't depend on node id ------------------
-  addNodeToTarget(targetNode: TreeManager<T>, nodeToAdd: TreeManager<T>): boolean {
-    if (!targetNode || !nodeToAdd) {
-      console.warn('Invalid input: targetNode and nodeToAdd must be valid TreeManager instances.')
-      return false
-    }
+  //  Ensure reactivity is preserved by syncing root
+  if (!isInit) syncRootState(newNode)
 
-    // Set parent of the new node
-    nodeToAdd.parent = targetNode
+  return newNode
+}
 
-    // Add to targetNode's children
-    nodeToAdd.depth = this.depth + 1
-    targetNode.children.push(nodeToAdd)
-    nodeToAdd.updateChildDepths()
-    return true
-  }
+const remove = <T>(node: TreeManager<T>): TreeManager<T> | undefined => {
+  node.parent?.state.value.children?.splice(node.index, 1)
 
-  //--------------- Add instance node manager ------------
-  addNodeInstance(node: TreeManager<T>): boolean {
-    if (node === this || this.isDescendantOf(node)) {
-      console.warn('Cannot add a node to itself or its descendants.')
-      return false
-    }
-    node.parent = this
-    node.depth = this.depth + 1
-    this.children.push(node)
-    node.updateChildDepths()
-    return true
-  }
+  const removed = node.parent?.children?.splice(node.index, 1)
+  if (removed?.[0]) syncRootState(removed[0])
+  if (!removed) return undefined
+  node.parent && updateIndices(node.parent as any, removed[0].index)
 
-  //------------------- remove any node -------------------------
-  removeNode(node: TreeManager<T>): boolean {
-    if (node.depth == 0) {
-      console.warn('Cannot remove the root node.')
-      return false
-    }
+  removed[0].parent = undefined
+  removed[0].index = 0
+  return removed[0]
+}
 
-    const parent = node.parent
-    //if parent was undefined
-    if (!parent) return false
-    //if the children doesn't exist
-    const index = parent.children.indexOf(node)
-    if (index === -1) return false
+const getParentChain = <T>(owner: TreeManager<T>) => {
+  const p = [] as TreeManager<T>[]
+  if (!owner.parent) return p
+  p.push(...getParentChain(owner.parent), owner.parent)
 
-    parent.children.splice(index, 1)
-    node.parent = undefined
-    node.depth = 0
-    node.updateChildDepths()
-    return true
-  }
-
-  //---------------- update node depth ----------------------------
-  private updateChildDepths(): void {
-    for (const child of this.children) {
-      child.depth = this.depth + 1
-      child.updateChildDepths()
-    }
-  }
-  //-------------- update descendant ------------------------
-  private isDescendantOf(potentialAncestor: TreeManager<T>): boolean {
-    let current: TreeManager<T> | undefined = this.parent
-    while (current) {
-      if (current === potentialAncestor) return true
-      current = current.parent
-    }
-    return false
-  }
-
-  //---------------------- Return tree data in JSON format ------------------
-  toJSONFormat(): any {
-    return {
-      ...this.data,
-      children: this.children.map(child => child.toJSONFormat())
-    }
-  }
- getParentChain(){
-  const p = [] as any[]
-  if(!this.parent) return p
-  p.push ( ...this.parent.getParentChain(),this.parent )
   return p
- }
+}
 
+export class TreeManager<T> {
+  private _depth = 0
+  private _index = 0
+  private _parent: undefined | TreeManager<T>
+  private _children = shallowReactive([]) as TreeManager<T>[]
+  constructor(initState = { children: [] } as ITree<T>) {
+    this._state.value = initState
+
+    initState.children?.forEach((x, index) => this.addNode(x, index, true))
+  }
+  get parent(): undefined | TreeManager<T> {
+    return this._parent
+  }
+  set parent(parent: TreeManager<T> | undefined) {
+    this._parent = parent
+    setDepth(this)
+  }
+  get index() {
+    return this._index
+  }
+  set index(v: number) {
+    this._index = v
+  }
+  get data() {
+    const { children, ...rest } = this.state.value
+    return rest
+  }
+  get children() {
+    return this._children
+  }
+  get depth() {
+    return this._depth
+  }
+  set depth(v: number) {
+    this._depth = v
+  }
+
+  private _state = ref({}) as Ref<ITree<T>>
+
+  get state() {
+    return this._state
+  }
+
+  emptyAllChildren() {
+    this._state.value.children = []
+  }
+  updater(value: any) {
+    this._state.value = value
+    debugger
+  }
+  addNode(data: ITree<T> | TreeManager<T>, index = -1, isInit = false): TreeManager<T> {
+    return addNode(this, data, index, isInit)
+  }
+
+  addNodes(data: (ITree<T> | TreeManager<T>)[]): TreeManager<T>[] {
+    return data.map((x, i) => this.addNode(x, i))
+  }
+
+  removeNodes(data: TreeManager<T>[]): (TreeManager<T> | undefined)[] {
+    return data.map(this.remove)
+  }
+
+  remove(node: TreeManager<T> = this): TreeManager<T> | undefined {
+    return remove(node)
+  }
+
+  toJSON(): ITree<T> {
+    return toJSON(this)
+  }
+
+  getParentChain() {
+    return getParentChain(this)
+  }
+  reset(initState: ITree<T> = { children: [] } as ITree<T>) {
+    this._state.value = initState
+    this._children.splice(0) // clear existing children nodes
+    this._depth = 0
+    this._index = 0
+    this._parent = undefined
+
+    initState.children?.forEach((x, index) => this.addNode(x, index, true))
+  }
 }
